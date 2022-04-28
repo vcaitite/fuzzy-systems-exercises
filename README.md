@@ -8,3 +8,4 @@ Contains exercise solutions for the following topics:
 1. Merbership Functions; 
 2. Fuzzy Operators;
 3. Tip Problem (Small problem used to illustrate the power of fuzzy logic principles).
+4. Function Approximation (Fuzzy Inference)
