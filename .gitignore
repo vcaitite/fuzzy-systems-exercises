@@ -8,7 +8,7 @@
 *.tex
 
 #Para arquivos de enunciado:
-*.pdf
+*Ex.pdf
 
 
 #Para database:
