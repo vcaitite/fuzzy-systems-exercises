@@ -1,7 +1,5 @@
-%% TRABALHO PRÁTICO - Sistemas Nebulosos
-% Vítor Gabriel Reis Caitité - 2016111849 
-
-
+%% Sistemas Nebulosos
+% Vítor Gabriel Reis Caitité - 2021712430
 
 %% QUESTÃO 1: Modelagem de sistema estático monovariável
 %
@@ -9,6 +7,7 @@
 %_____________________________________________________________________
 
 close all; clear; clc;
+warning('off','all');
 
 % Geração de dados
 N = 1000;
@@ -21,70 +20,45 @@ y_train = y(sort(idx(1:900)));
 X_test = X(sort(idx(901:1000)));
 y_test = y(sort(idx(901:1000)));
 
+
 %% Generate FIS Using Grid Partitioning
-options = genfisOptions('GridPartition');
-options.NumMembershipFunctions = 2;
-in_fis = genfis(X_train,y_train,options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train],options);
-ys=evalfis(out_fis, X_test);
-figure(1)
-plot(X_train, y_train, X_test, ys)
-legend('Training Data','Anfis Output');
+fig_number = 1;
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'GridPartition',2);
+figure(fig_number)
+plot(X_test, y_test, X_test, ys)
+legend('Test Data','Anfis Output');
 drawnow();
-figure(2)
+figure(fig_number+1)
 plot(ERROR.^2)
-fprintf('MSE: %.2E', immse(ys,y_test));
 drawnow();
-
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
 
 %% Generate FIS Using Subtractive Clustering
-
-options = genfisOptions('SubtractiveClustering');
-in_fis = genfis(X_train,y_train,options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train],options);
-ys=evalfis(out_fis, X_test);
-figure(3)
-plot(X_train, y_train, X_test, ys);
-legend('Training Data','Anfis Output');
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'SubtractiveClustering');
+figure(fig_number)
+plot(X_test, y_test, X_test, ys)
+legend('Test Data','Anfis Output');
 drawnow();
-figure(4)
-plot(ERROR.^2);
+figure(fig_number+1)
+plot(ERROR.^2)
 drawnow();
 fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
 
 %% Generate FIS Using FCM Clustering
-
-options = genfisOptions('FCMClustering');
-options.Verbose = false;
-in_fis = genfis(X_train,y_train,options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train],options);
-ys=evalfis(out_fis, X_test);
-figure(5)
-plot(X_train, y_train, X_test, ys);
-legend('Training Data','Anfis Output');
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'FCMClustering');
+figure(fig_number)
+plot(X_test, y_test, X_test, ys)
+legend('Test Data','Anfis Output');
 drawnow();
-figure(6)
-plot(ERROR.^2);
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
 fprintf('MSE: %.2E', immse(ys,y_test));
-drawnow();
+fig_number = fig_number + 2;
+
+
 
 %% QUESTÃO 2: Modelagem de sistema estático multivariável
 %
@@ -96,85 +70,237 @@ X_train = table2array(readtable('ex2_X_train.csv'));
 y_train = table2array(readtable('ex2_y_train.csv'));
 X_test = table2array(readtable('ex2_X_test.csv'));
 y_test = table2array(readtable('ex2_y_test.csv'));
-figure(7)
+figure(fig_number)
 plot(y_train);
 title("y_{train}");
 drawnow();
-figure(8)
+fig_number = fig_number + 1;
+figure(fig_number)
 plot(y_test);
 title("y_{test}");
 drawnow();
+fig_number = fig_number + 1;
 
 %% Generate FIS Using Grid Partitioning
-options = genfisOptions('GridPartition');
-options.NumMembershipFunctions = 3;
-in_fis = genfis(X_train,y_train,options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train],options);
-ys=evalfis(out_fis, X_test);
-figure(9)
-plot(y_test);
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'GridPartition',2);
+figure(fig_number)
+plot(y_test)
 hold on
-plot(ys);
-legend('Test Data','Anfis Output');
+plot(ys)
+legend('y_{test}','Anfis Output');
 drawnow();
-figure(10)
-plot(ERROR.^2);
-drawnow();
-fprintf('MSE: %.2E',  immse(ys,y_test));
-
-
-
-%% Generate FIS Using Subtractive Clustering
-
-options = genfisOptions('SubtractiveClustering');
-in_fis = genfis(X_train,y_train,options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train],options);
-ys=evalfis(out_fis, X_test);
-figure(11)
-plot(y_test);
-hold on
-plot(ys);
-drawnow();
-legend('Test Data','Anfis Output');
-figure(12)
-plot(ERROR.^2);
-drawnow();
-fprintf('MSE: %.2E',  immse(ys,y_test));
-
-%% Generate FIS Using FCM Clustering
-
-options = genfisOptions('FCMClustering');
-options.Verbose = false;
-in_fis = genfis(X_train,y_train, options);
-
-options = anfisOptions;
-options.InitialFIS = in_fis;
-options.EpochNumber = 100;
-options.DisplayStepSize = 0;
-options.DisplayErrorValues = 0;
-[out_fis,ERROR] = anfis([X_train y_train], options);
-ys=evalfis(out_fis, X_test);
-figure(13)
-plot(y_test);
-hold on
-plot(ys);
-legend('Test Data','Anfis Output');
-drawnow();
-figure(14)
-plot(ERROR.^2);
+figure(fig_number+1)
+plot(ERROR.^2)
 drawnow();
 fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using Subtractive Clustering
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'SubtractiveClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using FCM Clustering
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'FCMClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
 
 
+
+%% QUESTÃO 3: Modelo de sistema dinâmico
+%_____________________________________________________________________
+X_train = table2array(readtable('ex3_X_train.csv'));
+y_train = table2array(readtable('ex3_y_train.csv'));
+X_test = table2array(readtable('ex3_X_test.csv'));
+y_test = table2array(readtable('ex3_y_test.csv'));
+figure(fig_number)
+plot(y_train);
+title("y_{train}");
+drawnow();
+fig_number = fig_number + 1;
+figure(fig_number)
+plot(y_test);
+title("y_{test}");
+drawnow();
+fig_number = fig_number + 1;
+
+%% Generate FIS Using Grid Partitioning
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'GridPartition',  2);
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using Subtractive Clustering
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'SubtractiveClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using FCM Clustering
+[ys, ERROR] =run_anfis(X_train, y_train, X_test, 'FCMClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+
+
+%% QUESTÃO 4: Previsão de uma série temporal caótica
+%_____________________________________________________________________
+X_train = table2array(readtable('ex4_X_train.csv'));
+y_train = table2array(readtable('ex4_y_train.csv'));
+X_test = table2array(readtable('ex4_X_test.csv'));
+y_test = table2array(readtable('ex4_y_test.csv'));
+figure(fig_number)
+plot(y_train);
+title("y_{train}");
+drawnow();
+fig_number = fig_number + 1;
+figure(fig_number)
+plot(y_test);
+title("y_{test}");
+drawnow();
+fig_number = fig_number + 1;
+
+%% Generate FIS Using Grid Partitioning
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'GridPartition',  2);
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using Subtractive Clustering
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'SubtractiveClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using FCM Clustering
+[ys, ERROR] =run_anfis(X_train, y_train, X_test, 'FCMClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+
+%% QUESTÃO 5: Data set UCI
+%_____________________________________________________________________
+X_train = table2array(readtable('ex5_X_train.csv'));
+y_train = table2array(readtable('ex5_y_train.csv'));
+X_test = table2array(readtable('ex5_X_test.csv'));
+y_test = table2array(readtable('ex5_y_test.csv'));
+figure(fig_number)
+plot(y_train);
+title("y_{train}");
+drawnow();
+fig_number = fig_number + 1;
+figure(fig_number)
+plot(y_test);
+title("y_{test}");
+drawnow();
+fig_number = fig_number + 1;
+
+%% Generate FIS Using Grid Partitioning
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'GridPartition',  2);
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using Subtractive Clustering
+[ys, ERROR] = run_anfis(X_train, y_train, X_test, 'SubtractiveClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
+
+%% Generate FIS Using FCM Clustering
+[ys, ERROR] =run_anfis(X_train, y_train, X_test, 'FCMClustering');
+figure(fig_number)
+plot(y_test)
+hold on
+plot(ys)
+legend('y_{test}','Anfis Output');
+drawnow();
+figure(fig_number+1)
+plot(ERROR.^2)
+drawnow();
+fprintf('MSE: %.2E', immse(ys,y_test));
+fig_number = fig_number + 2;
